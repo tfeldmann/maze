@@ -5,198 +5,115 @@ extern crate rand;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
-#[derive(Debug)]
-struct Cell {
-    x: i32,
-    y: i32,
+const UP: u8 = 0b0001;
+const RIGHT: u8 = 0b0010;
+const DOWN: u8 = 0b0100;
+const LEFT: u8 = 0b1000;
+
+struct Point {
+    x: i64,
+    y: i64,
 }
 
-const DIR: [i8; 4] = [
-    0b0001, // up
-    0b0010, // right
-    0b0100, // down
-    0b1000, // left
+struct Direction {
+    passage: u8,
+    opposite: u8,
+    delta: Point,
+}
+
+const DIRECTIONS: [Direction; 4] = [
+    Direction {
+        passage: UP,
+        opposite: DOWN,
+        delta: Point { x: 0, y: 1 },
+    },
+    Direction {
+        passage: RIGHT,
+        opposite: LEFT,
+        delta: Point { x: 1, y: 0 },
+    },
+    Direction {
+        passage: DOWN,
+        opposite: UP,
+        delta: Point { x: 0, y: -1 },
+    },
+    Direction {
+        passage: LEFT,
+        opposite: RIGHT,
+        delta: Point { x: -1, y: 0 },
+    },
 ];
 
-const OPP_DIR: [i8; 4] = [
-    0b0100, // down
-    0b1000, // left
-    0b0001, // up
-    0b0010, // right
-];
+fn print_grid(grid: Vec<Vec<u8>>) {
+    for row in grid.iter() {
+        for cell in row.iter() {
+            print!("██{}", if (cell & DOWN) != 0 { "  " } else { "██" });
+        }
+        println!("██");
+        for cell in row.iter() {
+            print!("{}  ", if (cell & LEFT) != 0 { "  " } else { "██" });
+        }
+        println!("██");
+    }
+    for _ in 0..grid[0].len() {
+        print!("████");
+    }
+    println!("██");
+}
 
-const DX: [i8; 4] = [0, 1, 0, -1];
-const DY: [i8; 4] = [1, 0, -1, 0];
+fn maze(width: i64, height: i64) {
+    let mut grid: Vec<Vec<u8>> = vec![vec![0; width as usize]; height as usize];
+    let mut cells: Vec<Point> = vec![Point { x: 0, y: 0 }];
+    let mut dir_indices: Vec<u8> = (0..4).collect();
 
-fn maze(width: usize, height: usize) {
-    // the grid where we carve the passages between cells
-    let mut grid: Vec<Vec<usize>> = vec![vec![0; width]; height];
-
-    // the cells we have to handle
-    let mut cells: Vec<Cell> = vec![Cell { x: 0, y: 0 }];
+    // entry
+    grid[0][0] |= DOWN;
 
     while !cells.is_empty() {
         // we always start from the last cell
         let cell = &cells[cells.len() - 1];
 
         // shuffle directions
-        let mut dirs: Vec<u8> = (0..4).collect();
-        dirs.shuffle(&mut thread_rng());
+        dir_indices.shuffle(&mut thread_rng());
 
-        for dir in dirs.iter() {
-            // let nx: i32 = cell.x + DX.d;
-            // let ny: i32 = cell.y + DY.d;
-            println!("{:?}", dir);
+        let mut found = false;
+        for dir_index in dir_indices.iter() {
+            let dir = &DIRECTIONS[*dir_index as usize];
+
+            let nx = cell.x + dir.delta.x;
+            let ny = cell.y + dir.delta.y;
+
+            // if new cell is unvisited carve passage
+            if nx >= 0
+                && ny >= 0
+                && nx < width
+                && ny < height
+                && grid[ny as usize][nx as usize] == 0
+            {
+                grid[cell.y as usize][cell.x as usize] |= dir.passage;
+                grid[ny as usize][nx as usize] |= dir.opposite;
+                cells.push(Point { x: nx, y: ny });
+                found = true;
+                break;
+            }
         }
 
-        println!("{:?}", dirs);
-        println!("{:?}", cell);
-        println!("{:?}", grid);
-        cells.pop();
+        if !found {
+            cells.pop();
+        }
     }
+    print_grid(grid)
 }
 
 fn main() {
-    println!("Maze");
-    maze(20, 20);
+    maze(10, 6);
 }
 
+// const BORDER: [char; 11] = ['┴', '├', '┬', '┤', '┼', '─', '│', '┌', '┐', '└', '┘'];
 /*
-class Maze
-{
-    // Properties
-    // ----------
-    int rows, cols;
-    int[][] grid;
-
-    int dir[] = {
-        unbinary("0001"), // North
-        unbinary("0010"), // East
-        unbinary("0100"), // South
-        unbinary("1000")    // West
-    };
-
-    int opposite[] = {
-        unbinary("0100"), // South
-        unbinary("1000"), // West
-        unbinary("0001"), // North
-        unbinary("0010")    // East
-    };
-
-    int dx[] = {0, 1,    0, -1};
-    int dy[] = {1, 0, -1,    0};
-
-
-    // Constructor and maze generation
-    // -------------------------------
-    Maze(int cols, int rows)
-    {
-        // variables
-        // ---------
-        this.rows = rows;
-        this.cols = cols;
-
-        ArrayList cells = new ArrayList();
-        grid = new int[cols][rows];
-
-
-        // Define 0|0 as starting Cell
-        // ----------------------------
-        cells.add(new MazeCell(0, 0));
-
-
-        // start growing tree algorithm
-        // ----------------------------
-        while (cells.size() > 0)
-        {
-
-            // backtrack to newest cell
-            // ------------------------
-            int index = cells.size() - 1;
-            MazeCell cell = (MazeCell) cells.get(index);
-            int x = cell.x;
-            int y = cell.y;
-
-
-            // shuffle possible directions
-            // ---------------------------
-            Integer[] directions = new Integer[4];
-            for (int i = 0; i < directions.length; i++)
-            {
-                directions[i] = new Integer(i);
-            }
-            java.util.Collections.shuffle(java.util.Arrays.asList(directions));
-
-
-            // try visiting neighbour cells
-            // ----------------------------
-            for (int i = 0; i < directions.length; i++)
-            {
-                int selDir = int(directions[i]);
-                int nx = x + dx[selDir];
-                int ny = y + dy[selDir];
-
-
-                // if new cell is unvisited carve passage
-                // --------------------------------------
-                if (nx >= 0 && ny >= 0 && nx < cols && ny < rows && grid[nx][ny] == 0)
-                {
-                     grid[x][y]     |= dir[selDir];
-                     grid[nx][ny] |= opposite[selDir];
-                     cells.add(new MazeCell(nx, ny));
-                     index = -1;
-                     break;
-                }
-            }
-
-            // dead end: remove cell from list
-            // -------------------------------
-            if (index != -1)
-            {
-                cells.remove(index);
-            }
-        }
-
-    }
-
-
-    // Drawing Method
-    // --------------
-    void draw(int cellSize)
-    {
-
-        // draw line when no passage is carved
-        // -----------------------------------
-        for (int y = 0; y < rows; y++)
-        {
-            for (int x = 0; x < cols; x++)
-            {
-                // north
-                if ((grid[x][y] & dir[0]) == 0)
-                    line(x * cellSize, (y+1) * cellSize,
-                             (x+1) * cellSize, (y+1) * cellSize);
-
-                // east
-                if ((grid[x][y] & dir[1]) == 0)
-                    line((x+1) * cellSize, y * cellSize,
-                             (x+1) * cellSize, (y+1) * cellSize);
-
-                // south
-                if ((grid[x][y] & dir[2]) == 0)
-                    line(x * cellSize, y * cellSize,
-                             (x+1) * cellSize, y * cellSize);
-
-                // west
-                if ((grid[x][y] & dir[3]) == 0)
-                    line(x * cellSize, y * cellSize,
-                             x * cellSize, (y+1) * cellSize);
-            }
-        }
-
-    }
-
-}
-
-
-
+─	━	│	┃	┄	┅	┆	┇	┈	┉	┊	┋	┌	┍	┎	┏
+U+251x	┐	┑	┒	┓	└	┕	┖	┗	┘	┙	┚	┛	├	┝	┞	┟
+U+252x	┠	┡	┢	┣	┤	┥	┦	┧	┨	┩	┪	┫	┬	┭	┮	┯
+U+253x	┰	┱	┲	┳	┴	┵	┶	┷	┸	┹	┺	┻	┼	┽	┾	┿
+U+254x	╀	╁	╂	╃	╄	╅	╆	╇	╈	╉	╊	╋	╌	╍	╎	╏
 */
