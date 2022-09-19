@@ -68,15 +68,17 @@ pub fn maze(width: i64, height: i64) -> Vec<Vec<u8>> {
             let nx = cell.x + dir.delta.x;
             let ny = cell.y + dir.delta.y;
 
-            // if new cell is unvisited carve passage
+            // check whether new cell is unvisited
             if nx >= 0
                 && ny >= 0
                 && nx < width
                 && ny < height
                 && grid[ny as usize][nx as usize] == 0
             {
+                // carve passage
                 grid[cell.y as usize][cell.x as usize] |= dir.passage;
                 grid[ny as usize][nx as usize] |= dir.opposite;
+                // continue with new cell
                 cells.push(Point { x: nx, y: ny });
                 found = true;
                 break;
