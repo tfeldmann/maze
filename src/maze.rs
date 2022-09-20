@@ -91,27 +91,3 @@ pub fn maze(width: i64, height: i64) -> Vec<Vec<u8>> {
     }
     return grid;
 }
-
-pub fn print_grid(grid: Vec<Vec<u8>>) {
-    for row in grid.iter() {
-        for cell in row.iter() {
-            print!("██{}", if (cell & DOWN) != 0 { "  " } else { "██" });
-        }
-        println!(
-            "{}",
-            if (row[row.len() - 1] & RIGHT) != 0 {
-                "  "
-            } else {
-                "██"
-            }
-        );
-        for cell in row.iter() {
-            print!("{}  ", if (cell & LEFT) != 0 { "  " } else { "██" });
-        }
-        println!("██");
-    }
-    for _ in 0..grid[0].len() {
-        print!("████");
-    }
-    println!("██");
-}
