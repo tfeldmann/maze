@@ -1,6 +1,7 @@
-# Rust maze generator
+# maze
 
-Generates nice looking mazes using a growing tree algorithm and prints them to stdout.
+This is a maze generator for the command line.
+It generates nice looking mazes using a growing tree algorithm.
 
 ```
 $ cargo run
@@ -18,5 +19,3 @@ $ cargo run
 ██                              ██      ██
 ██████████████████████████████████████  ██
 ```
-
-(This is a test repository to get to know the rust language better)
