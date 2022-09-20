@@ -1,24 +1,26 @@
-use std::env;
 use std::time::Instant;
+
+use clap::Parser;
 mod maze;
 
+/// Search for a pattern in a file and display the lines that contain it.
+#[derive(Parser, Debug)]
+#[clap(name = "maze")]
+#[clap(author, version, about, long_about=None)]
+struct Cli {
+    #[clap(default_value_t = 10, value_parser=clap::value_parser!(i64).range(1..))]
+    width: i64,
+    #[clap(default_value_t = 10, value_parser=clap::value_parser!(i64).range(1..))]
+    height: i64,
+}
+
 fn main() {
-    let args: Vec<String> = env::args().collect();
-    dbg!(args);
+    let args = Cli::parse();
 
     let now = Instant::now();
-    let m = maze::maze(10, 10);
+    let m = maze::maze(args.width, args.height);
     let elapsed_time = now.elapsed();
 
     maze::print_grid(m);
     println!("Maze generated in {} ms.", elapsed_time.as_millis());
 }
-
-// const BORDER: [char; 11] = ['┴', '├', '┬', '┤', '┼', '─', '│', '┌', '┐', '└', '┘'];
-/*
-─	━	│	┃	┄	┅	┆	┇	┈	┉	┊	┋	┌	┍	┎	┏
-U+251x	┐	┑	┒	┓	└	┕	┖	┗	┘	┙	┚	┛	├	┝	┞	┟
-U+252x	┠	┡	┢	┣	┤	┥	┦	┧	┨	┩	┪	┫	┬	┭	┮	┯
-U+253x	┰	┱	┲	┳	┴	┵	┶	┷	┸	┹	┺	┻	┼	┽	┾	┿
-U+254x	╀	╁	╂	╃	╄	╅	╆	╇	╈	╉	╊	╋	╌	╍	╎	╏
-*/
