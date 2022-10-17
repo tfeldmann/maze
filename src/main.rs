@@ -1,6 +1,6 @@
+use clap::Parser;
 use std::time::Instant;
 
-use clap::Parser;
 mod maze;
 mod render;
 
@@ -8,10 +8,12 @@ mod render;
 #[derive(Parser, Debug)]
 #[clap(version, about, long_about=None)]
 struct Cli {
-    #[clap(default_value_t = 10, value_parser=clap::value_parser!(i64).range(1..))]
+    #[clap(default_value_t = 20, value_parser=clap::value_parser!(i64).range(1..))]
     width: i64,
     #[clap(default_value_t = 10, value_parser=clap::value_parser!(i64).range(1..))]
     height: i64,
+    // #[clap(long, short)]
+    // verbose: Option<bool>,
 }
 
 fn main() {
