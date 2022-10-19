@@ -3,120 +3,70 @@ use crate::maze;
 // https://www.utf8-chartable.de/unicode-utf8-table.pl?start=9472&number=512
 
 /*
-U
-  R
-U R
-    D
-U   D
-  R D
-U R D
-      L
-U     L
-  R   L
-U R   L
-    D L
-U   D L
-  R D L
-U R D L
+Grid passages:
+ 0:
+ 1: U
+ 2:   R
+ 3: U R
+ 4:     D
+ 5: U   D
+ 6:   R D
+ 7: U R D
+ 8:       L
+ 9: U     L
+10:   R   L
+11: U R   L
+12:     D L
+13: U   D L
+14:   R D L
+15: U R D L
 */
 
-const STRAIGHT: [char; 16] = [
-    ' ',   //
-    '╵', //  U
-    '╶', //    R
-    '└', //  U R
-    '╷', //      D
-    '│', //  U   D
-    '┌', //    R D
-    '├', //  U R D
-    '╴', //        L
-    '┘', //  U     L
-    '─', //    R
-    '┴', //  U R   L
-    '┐', //      D L
-    '┤', //  U   D L
-    '┬', //    R D L
-    '┼', //  U R D L
-];
-
-const STRAIGHT_WIDE: [&str; 16] = [
-    "  ",     //
-    "╵ ",   //  U
-    "╶─", //    R
-    "└─", //  U R
-    "╷ ",   //      D
-    "│ ",   //  U   D
-    "┌─", //    R D
-    "├─", //  U R D
-    "╴ ",   //        L
-    "┘ ",   //  U     L
-    "──", //    R
-    "┴─", //  U R   L
-    "┐ ",   //      D L
-    "┤ ",   //  U   D L
-    "┬─", //    R D L
-    "┼─", //  U R D L
-];
-
-const ROUND: [char; 16] = [
-    ' ',   //
-    '╵', // U
-    '╶', //   R
-    '╰', // U R
-    '╷', //     D
-    '│', // U   D
-    '╭', //   R D
-    '├', // U R D
-    '╴', //       L
-    '╯', // U     L
-    '─', //   R   L
-    '┴', // U R   L
-    '╮', //     D L
-    '┤', // U   D L
-    '┬', //   R D L
-    '┼', // U R D L
-];
-
-const ROUND_WIDE: [&str; 16] = [
-    "  ",     //
-    "╵ ",   // U
-    "╶─", //   R
-    "╰─", // U R
-    "╷ ",   //     D
-    "│ ",   // U   D
-    "╭─", //   R D
-    "├─", // U R D
-    "╴ ",   //       L
-    "╯ ",   // U     L
-    "──", //   R   L
-    "┴─", // U R   L
-    "╮ ",   //     D L
-    "┤ ",   // U   D L
-    "┬─", //   R D L
-    "┼─", // U R D L
-];
-
-// pub fn print_logic_table() {
-//     for p in 0..=0b1111 {
-//         print!("{:2}:", p);
-//         print!(" {}", if p & maze::UP != 0 { "U" } else { " " });
-//         print!(" {}", if p & maze::RIGHT != 0 { "R" } else { " " });
-//         print!(" {}", if p & maze::DOWN != 0 { "D" } else { " " });
-//         print!(" {}", if p & maze::LEFT != 0 { "L" } else { " " });
-//         println!();
-//     }
-// }
-
-pub fn path(grid: &Vec<Vec<u8>>) {
-    for y in (0..grid.len()).rev() {
-        for x in 0..grid[0].len() {
-            print!("{}", STRAIGHT_WIDE[grid[y][x] as usize]);
-        }
-        println!();
-    }
+pub struct PathTheme {
+    chars: [char; 16],
+    widen_char: char,
 }
 
-pub fn unicode_thick(grid: &Vec<Vec<u8>>) -> String {
+pub const PATH_STRAIGHT: PathTheme = PathTheme {
+    chars: [
+        ' ', '╵', '╶', '└', '╷', '│', '┌', '├', '╴', '┘', '─', '┴', '┐', '┤', '┬', '┼',
+    ],
+    widen_char: '─',
+};
+
+pub const PATH_HEAVY: PathTheme = PathTheme {
+    chars: [
+        ' ', '╹', '╺', '┗', '╻', '┃', '┏', '┣', '╸', '┛', '━', '┻', '┓', '┫', '┳', '╋',
+    ],
+    widen_char: '━',
+};
+
+pub const PATH_ROUND: PathTheme = PathTheme {
+    chars: [
+        ' ', '╵', '╶', '╰', '╷', '│', '╭', '├', '╴', '╯', '─', '┴', '╮', '┤', '┬', '┼',
+    ],
+    widen_char: '─',
+};
+
+pub fn path(grid: &Vec<Vec<u8>>, theme: PathTheme, wide: bool) -> String {
+    let mut result = String::new();
+    for y in (0..grid.len()).rev() {
+        for x in 0..grid[0].len() {
+            result.push(theme.chars[grid[y][x] as usize]);
+            if wide {
+                if grid[y][x] & maze::RIGHT != 0 {
+                    result.push(theme.widen_char);
+                } else {
+                    result.push(' ');
+                }
+            }
+        }
+        result.push('\n');
+    }
+    return result;
+}
+
+pub fn walls(grid: &Vec<Vec<u8>>) -> String {
     let mut result = String::new();
     for row in grid.iter() {
         for cell in row.iter() {

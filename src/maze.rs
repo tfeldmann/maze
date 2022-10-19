@@ -12,8 +12,8 @@ pub const DOWN: u8 = 0b0100;
 pub const LEFT: u8 = 0b1000;
 
 struct Point {
-    x: i64,
-    y: i64,
+    x: i32,
+    y: i32,
 }
 
 struct Direction {
@@ -45,7 +45,7 @@ const DIRECTIONS: [Direction; 4] = [
     },
 ];
 
-pub fn maze(width: i64, height: i64) -> Vec<Vec<u8>> {
+pub fn maze(width: i32, height: i32) -> Vec<Vec<u8>> {
     let mut grid: Vec<Vec<u8>> = vec![vec![0; width as usize]; height as usize];
     let mut cells: Vec<Point> = Vec::with_capacity(height as usize * width as usize);
     let mut dir_indices: Vec<u8> = (0..4).collect();

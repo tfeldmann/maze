@@ -8,10 +8,10 @@ mod render;
 #[derive(Parser, Debug)]
 #[clap(version, about, long_about=None)]
 struct Cli {
-    #[clap(default_value_t = 20, value_parser=clap::value_parser!(i64).range(1..))]
-    width: i64,
-    #[clap(default_value_t = 10, value_parser=clap::value_parser!(i64).range(1..))]
-    height: i64,
+    #[clap(default_value_t = 20, value_parser=clap::value_parser!(i32).range(1..))]
+    width: i32,
+    #[clap(default_value_t = 10, value_parser=clap::value_parser!(i32).range(1..))]
+    height: i32,
     // #[clap(long, short)]
     // verbose: Option<bool>,
 }
@@ -23,8 +23,9 @@ fn main() {
     let m = maze::maze(args.width, args.height);
     let elapsed_time = now.elapsed();
 
-    render::path(&m);
-    let result = render::unicode_thick(&m);
+    let path_result = render::path(&m, render::PATH_HEAVY, true);
+    let result = render::walls(&m);
     println!("{}", result);
+    println!("{}", path_result);
     println!("Maze generated in {} ms.", elapsed_time.as_millis());
 }
