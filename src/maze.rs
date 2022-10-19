@@ -50,9 +50,12 @@ pub fn maze(width: i64, height: i64) -> Vec<Vec<u8>> {
     let mut cells: Vec<Point> = Vec::with_capacity(height as usize * width as usize);
     let mut dir_indices: Vec<u8> = (0..4).collect();
 
-    // entry
-    cells.push(Point { x: 0, y: 0 });
-    grid[0][0] |= DOWN;
+    // entry on top left
+    cells.push(Point {
+        x: 0,
+        y: height - 1,
+    });
+    grid[(height - 1) as usize][0] |= UP;
 
     while !cells.is_empty() {
         // we always start from the last cell
@@ -89,5 +92,9 @@ pub fn maze(width: i64, height: i64) -> Vec<Vec<u8>> {
             cells.pop();
         }
     }
+
+    // exit bottom right
+    grid[0][width as usize - 1] |= DOWN;
+
     return grid;
 }

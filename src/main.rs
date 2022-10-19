@@ -23,7 +23,8 @@ fn main() {
     let m = maze::maze(args.width, args.height);
     let elapsed_time = now.elapsed();
 
-    let result = render::unicode_thick(m);
+    render::path(&m);
+    let result = render::unicode_thick(&m);
     println!("{}", result);
     println!("Maze generated in {} ms.", elapsed_time.as_millis());
 }
