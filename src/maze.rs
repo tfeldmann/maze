@@ -6,6 +6,7 @@ extern crate rand;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
+// TODO: Use bitflags crate for type safety
 pub const UP: u8 = 0b0001;
 pub const RIGHT: u8 = 0b0010;
 pub const DOWN: u8 = 0b0100;
