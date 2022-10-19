@@ -8,7 +8,7 @@ mod render;
 #[clap(version, about, long_about=None)]
 struct Cli {
     /// The theme
-    #[arg(short='t', long="theme", value_enum, default_value_t = Theme::Path)]
+    #[arg(short='t', long="theme", value_enum, default_value_t = Theme::Walls)]
     theme: Theme,
     /// Maze width in blocks
     #[clap(default_value_t = 20, value_parser=clap::value_parser!(i32).range(1..))]
@@ -16,8 +16,8 @@ struct Cli {
     /// Maze height in blocks
     #[clap(default_value_t = 10, value_parser=clap::value_parser!(i32).range(1..))]
     height: i32,
-    // #[clap(long, short)]
-    // verbose: Option<bool>,
+    #[arg(short, long)]
+    verbose: bool,
 }
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, ValueEnum, Debug)]
@@ -28,6 +28,7 @@ enum Theme {
     PathNarrow,
     PathHeavyNarrow,
     PathRoundNarrow,
+    Walls,
 }
 
 fn main() {
@@ -37,16 +38,17 @@ fn main() {
     let m = maze::maze(args.width, args.height);
     let elapsed_time = now.elapsed();
 
-    let theme_result = match args.theme {
+    let result = match args.theme {
         Theme::Path => render::path(&m, render::PATH_STRAIGHT, true),
         Theme::PathHeavy => render::path(&m, render::PATH_HEAVY, true),
         Theme::PathRound => render::path(&m, render::PATH_ROUND, true),
         Theme::PathNarrow => render::path(&m, render::PATH_STRAIGHT, false),
         Theme::PathHeavyNarrow => render::path(&m, render::PATH_HEAVY, false),
         Theme::PathRoundNarrow => render::path(&m, render::PATH_ROUND, false),
+        Theme::Walls => render::walls(&m),
     };
-    let result = render::walls(&m);
     println!("{}", result);
-    println!("{}", theme_result);
-    println!("Maze generated in {} ms.", elapsed_time.as_millis());
+    if args.verbose {
+        println!("Maze generated in {} ms.", elapsed_time.as_millis());
+    }
 }
