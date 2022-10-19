@@ -8,7 +8,7 @@ mod render;
 #[clap(version, about, long_about=None)]
 struct Cli {
     /// The theme
-    #[arg(short='t', long="theme", value_enum, default_value_t = Theme::Walls)]
+    #[arg(short, long, value_enum, default_value_t = Theme::Walls)]
     theme: Theme,
     /// Maze width in blocks
     #[clap(default_value_t = 20, value_parser=clap::value_parser!(i32).range(1..))]
@@ -47,7 +47,8 @@ fn main() {
         Theme::PathRoundNarrow => render::path(&m, render::PATH_ROUND, false),
         Theme::Walls => render::walls(&m),
     };
-    println!("{}", result);
+    print!("{}", result);
+
     if args.verbose {
         println!("Maze generated in {} ms.", elapsed_time.as_millis());
     }
