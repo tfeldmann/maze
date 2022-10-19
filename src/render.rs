@@ -1,25 +1,28 @@
 use crate::maze;
 
-// https://www.utf8-chartable.de/unicode-utf8-table.pl?start=9472&number=512
-
 /*
-Grid passages:
- 0:
- 1: U
- 2:   R
- 3: U R
- 4:     D
- 5: U   D
- 6:   R D
- 7: U R D
- 8:       L
- 9: U     L
-10:   R   L
-11: U R   L
-12:     D L
-13: U   D L
-14:   R D L
-15: U R D L
+UTF-8 table:
+
+    https://www.utf8-chartable.de/unicode-utf8-table.pl?start=9472&number=512
+
+Passages for grid values:
+
+     0:
+     1: U
+     2:   R
+     3: U R
+     4:     D
+     5: U   D
+     6:   R D
+     7: U R D
+     8:       L
+     9: U     L
+    10:   R   L
+    11: U R   L
+    12:     D L
+    13: U   D L
+    14:   R D L
+    15: U R D L
 */
 
 pub struct PathTheme {
