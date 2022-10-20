@@ -53,9 +53,12 @@ pub const PATH_ROUND: PathTheme = PathTheme {
 
 pub fn path(grid: &Vec<Vec<u8>>, theme: PathTheme, wide: bool) -> String {
     let mut result = String::new();
+
+    let height = grid.len();
     let width = grid[0].len();
-    for y in (0..grid.len()).rev() {
-        for x in 0..grid[0].len() {
+
+    for y in (0..height).rev() {
+        for x in 0..width {
             let passages = grid[y][x];
             result.push(theme.chars[passages as usize]);
             if wide && x != width - 1 {
@@ -71,8 +74,14 @@ pub fn path(grid: &Vec<Vec<u8>>, theme: PathTheme, wide: bool) -> String {
     return result;
 }
 
+pub fn _walls2(_grid: &Vec<Vec<u8>>) -> String {
+    let mut result = String::with_capacity(20);
+    result.push_str("das");
+    result
+}
+
 pub fn walls(grid: &Vec<Vec<u8>>) -> String {
-    let mut result = String::new();
+    let mut result = String::with_capacity(10);
     for row in grid.iter() {
         for cell in row.iter() {
             if (cell & maze::DOWN) != 0 {
