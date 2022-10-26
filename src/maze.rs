@@ -27,7 +27,7 @@ const DIRECTIONS: [Direction; 4] = [
     Direction {
         passage: UP,
         opposite: DOWN,
-        delta: Point { x: 0, y: 1 },
+        delta: Point { x: 0, y: -1 },
     },
     Direction {
         passage: RIGHT,
@@ -37,7 +37,7 @@ const DIRECTIONS: [Direction; 4] = [
     Direction {
         passage: DOWN,
         opposite: UP,
-        delta: Point { x: 0, y: -1 },
+        delta: Point { x: 0, y: 1 },
     },
     Direction {
         passage: LEFT,
@@ -47,20 +47,20 @@ const DIRECTIONS: [Direction; 4] = [
 ];
 
 pub fn maze(width: i32, height: i32) -> Vec<Vec<u8>> {
-    let mut grid: Vec<Vec<u8>> = vec![vec![0; width as usize]; height as usize];
-    let mut cells: Vec<Point> = Vec::with_capacity(height as usize * width as usize);
+    let mut path: Vec<Vec<u8>> = vec![vec![0; width as usize]; height as usize];
+    let mut visited: Vec<Point> = Vec::with_capacity(height as usize * width as usize);
     let mut dir_indices: Vec<u8> = (0..4).collect();
 
     // entry on top left
-    cells.push(Point {
+    visited.push(Point {
         x: 0,
         y: height - 1,
     });
-    grid[(height - 1) as usize][0] |= UP;
+    path[(height - 1) as usize][0] |= UP;
 
-    while !cells.is_empty() {
+    while !visited.is_empty() {
         // we always start from the last cell
-        let cell = &cells[cells.len() - 1];
+        let cell = &visited[visited.len() - 1];
 
         // shuffle directions
         dir_indices.shuffle(&mut thread_rng());
@@ -77,25 +77,25 @@ pub fn maze(width: i32, height: i32) -> Vec<Vec<u8>> {
                 && ny >= 0
                 && nx < width
                 && ny < height
-                && grid[ny as usize][nx as usize] == 0
+                && path[ny as usize][nx as usize] == 0
             {
                 // carve passage
-                grid[cell.y as usize][cell.x as usize] |= dir.passage;
-                grid[ny as usize][nx as usize] |= dir.opposite;
+                path[cell.y as usize][cell.x as usize] |= dir.passage;
+                path[ny as usize][nx as usize] |= dir.opposite;
                 // continue with new cell
-                cells.push(Point { x: nx, y: ny });
+                visited.push(Point { x: nx, y: ny });
                 found = true;
                 break;
             }
         }
 
         if !found {
-            cells.pop();
+            visited.pop();
         }
     }
 
     // exit bottom right
-    grid[0][width as usize - 1] |= DOWN;
+    path[0][width as usize - 1] |= DOWN;
 
-    return grid;
+    return path;
 }

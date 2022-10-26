@@ -30,34 +30,33 @@ pub struct PathTheme {
     widen_char: char,
 }
 
-pub const PATH_STRAIGHT: PathTheme = PathTheme {
+pub const THEME_STRAIGHT: PathTheme = PathTheme {
     chars: [
         ' ', '╵', '╶', '└', '╷', '│', '┌', '├', '╴', '┘', '─', '┴', '┐', '┤', '┬', '┼',
     ],
     widen_char: '─',
 };
 
-pub const PATH_HEAVY: PathTheme = PathTheme {
+pub const THEME_HEAVY: PathTheme = PathTheme {
     chars: [
         ' ', '╹', '╺', '┗', '╻', '┃', '┏', '┣', '╸', '┛', '━', '┻', '┓', '┫', '┳', '╋',
     ],
     widen_char: '━',
 };
 
-pub const PATH_ROUND: PathTheme = PathTheme {
+pub const THEME_ROUND: PathTheme = PathTheme {
     chars: [
         ' ', '╵', '╶', '╰', '╷', '│', '╭', '├', '╴', '╯', '─', '┴', '╮', '┤', '┬', '┼',
     ],
     widen_char: '─',
 };
 
-pub fn path(grid: &Vec<Vec<u8>>, theme: PathTheme, wide: bool) -> String {
-    let mut result = String::new();
-
+pub fn draw_path(grid: &Vec<Vec<u8>>, theme: PathTheme, wide: bool) -> String {
     let height = grid.len();
     let width = grid[0].len();
 
-    for y in (0..height).rev() {
+    let mut result = String::with_capacity(height * width * (wide as usize + 1));
+    for y in 0..height {
         for x in 0..width {
             let passages = grid[y][x];
             result.push(theme.chars[passages as usize]);
@@ -74,9 +73,36 @@ pub fn path(grid: &Vec<Vec<u8>>, theme: PathTheme, wide: bool) -> String {
     return result;
 }
 
-pub fn _walls2(_grid: &Vec<Vec<u8>>) -> String {
-    let mut result = String::with_capacity(20);
-    result.push_str("das");
+pub fn _walls2(path: &Vec<Vec<u8>>) -> String {
+    // we create walls, which are a path *around* the given path
+    let height = path.len() + 1;
+    let width = path[0].len() + 1;
+
+    let mut walls: Vec<Vec<u8>> = vec![vec![0; width as usize]; height as usize];
+    // each cell in walls indicates, which neighbor cells dont have passages in the
+    // given direction.
+
+    for y in 0..height {
+        for x in 0..width {
+            /*
+            0,0: -1,-1  0,-1  -1,0  0,0
+            1,0:  0,-1  1,-1  0,0   1,0
+            2,0:  0,0
+            3,0:  0,0
+
+            Wall 1,1:
+                Hoch?
+                    0,0 rechts
+                Rechts?
+                    1,0 unten oder 1,1 oben
+            */
+            print!("{:2} {:2} |", x, y);
+        }
+        println!();
+    }
+
+    let mut result = String::new();
+    result = draw_path(path, THEME_STRAIGHT, true);
     result
 }
 

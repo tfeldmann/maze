@@ -39,13 +39,13 @@ fn main() {
     let elapsed_time = now.elapsed();
 
     let result = match args.theme {
-        Theme::Path => render::path(&m, render::PATH_STRAIGHT, true),
-        Theme::PathHeavy => render::path(&m, render::PATH_HEAVY, true),
-        Theme::PathRound => render::path(&m, render::PATH_ROUND, true),
-        Theme::PathNarrow => render::path(&m, render::PATH_STRAIGHT, false),
-        Theme::PathHeavyNarrow => render::path(&m, render::PATH_HEAVY, false),
-        Theme::PathRoundNarrow => render::path(&m, render::PATH_ROUND, false),
-        Theme::Walls => render::walls(&m),
+        Theme::Path => render::draw_path(&m, render::THEME_STRAIGHT, true),
+        Theme::PathHeavy => render::draw_path(&m, render::THEME_HEAVY, true),
+        Theme::PathRound => render::draw_path(&m, render::THEME_ROUND, true),
+        Theme::PathNarrow => render::draw_path(&m, render::THEME_STRAIGHT, false),
+        Theme::PathHeavyNarrow => render::draw_path(&m, render::THEME_HEAVY, false),
+        Theme::PathRoundNarrow => render::draw_path(&m, render::THEME_ROUND, false),
+        Theme::Walls => render::_walls2(&m),
     };
     print!("{}", result);
 
