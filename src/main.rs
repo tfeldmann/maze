@@ -45,7 +45,7 @@ fn main() {
         Theme::PathNarrow => render::draw_path(&m, render::THEME_STRAIGHT, false),
         Theme::PathHeavyNarrow => render::draw_path(&m, render::THEME_HEAVY, false),
         Theme::PathRoundNarrow => render::draw_path(&m, render::THEME_ROUND, false),
-        Theme::Walls => render::_walls2(&m),
+        Theme::Walls => render::walls(&m),
     };
     print!("{}", result);
 

@@ -6,6 +6,8 @@ extern crate rand;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
+type Path = Vec<Vec<u8>>;
+
 // TODO: Use bitflags crate for type safety
 pub const UP: u8 = 0b0001;
 pub const RIGHT: u8 = 0b0010;
@@ -46,17 +48,14 @@ const DIRECTIONS: [Direction; 4] = [
     },
 ];
 
-pub fn maze(width: i32, height: i32) -> Vec<Vec<u8>> {
-    let mut path: Vec<Vec<u8>> = vec![vec![0; width as usize]; height as usize];
+pub fn maze(width: i32, height: i32) -> Path {
+    let mut path: Path = vec![vec![0; width as usize]; height as usize];
     let mut visited: Vec<Point> = Vec::with_capacity(height as usize * width as usize);
     let mut dir_indices: Vec<u8> = (0..4).collect();
 
     // entry on top left
-    visited.push(Point {
-        x: 0,
-        y: height - 1,
-    });
-    path[(height - 1) as usize][0] |= UP;
+    path[0][0] |= UP;
+    visited.push(Point { x: 0, y: 0 });
 
     while !visited.is_empty() {
         // we always start from the last cell
@@ -95,7 +94,7 @@ pub fn maze(width: i32, height: i32) -> Vec<Vec<u8>> {
     }
 
     // exit bottom right
-    path[0][width as usize - 1] |= DOWN;
+    path[height as usize - 1][width as usize - 1] |= DOWN;
 
     return path;
 }
