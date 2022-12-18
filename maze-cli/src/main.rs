@@ -47,7 +47,7 @@ fn main() {
         Theme::PathRoundNarrow => maze.unicode_path(THEME_ROUND, false),
         Theme::Walls => maze.unicode_walls(THEME_STRAIGHT, true),
     };
-    println!("{}", result);
+    print!("{}", result);
 
     if args.verbose {
         println!("Maze generated in {} ms.", elapsed_time.as_millis());
