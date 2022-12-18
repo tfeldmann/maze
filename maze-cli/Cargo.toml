@@ -1,0 +1,12 @@
+[package]
+name = "maze-cli"
+version = "0.1.0"
+edition = "2021"
+authors = ["Thomas Feldmann <mail@tfeldmann.de>"]
+description = "Generates nice looking mazes."
+readme = "../README.md"
+license = "MIT"
+
+[dependencies]
+maze-lib = { path = "../maze-lib" }
+clap = { version = "4.0.23", features = ["derive"] }

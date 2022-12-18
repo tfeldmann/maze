@@ -1,14 +1,2 @@
-[package]
-name = "maze"
-version = "0.1.0"
-edition = "2021"
-authors = ["Thomas Feldmann <mail@tfeldmann.de>"]
-description = "Generates nice looking mazes."
-readme = "README.md"
-license = "MIT"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-clap = { version = "4.0.23", features = ["derive"] }
-rand = "0.8.5"
+[workspace]
+members = ["maze-lib", "maze-cli", "maze-wasm"]
