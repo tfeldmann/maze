@@ -24,26 +24,42 @@ Passages for grid values:
 */
 use crate::{Maze, DOWN, LEFT, RIGHT, UP};
 
-pub struct PathTheme {
+pub struct Theme {
     chars: [char; 16],
     widen_char: char,
 }
 
-pub const THEME_STRAIGHT: PathTheme = PathTheme {
+impl Theme {
+    fn for_directions(&self, directions: u8, wide: bool) -> String {
+        let theme_char = self.chars[directions as usize];
+        if wide {
+            let wide_char = if directions & RIGHT != 0 {
+                self.widen_char
+            } else {
+                ' '
+            };
+            format!("{}{}", theme_char, wide_char)
+        } else {
+            theme_char.to_string()
+        }
+    }
+}
+
+pub const THEME_STRAIGHT: Theme = Theme {
     chars: [
         ' ', '╵', '╶', '└', '╷', '│', '┌', '├', '╴', '┘', '─', '┴', '┐', '┤', '┬', '┼',
     ],
     widen_char: '─',
 };
 
-pub const THEME_HEAVY: PathTheme = PathTheme {
+pub const THEME_HEAVY: Theme = Theme {
     chars: [
         ' ', '╹', '╺', '┗', '╻', '┃', '┏', '┣', '╸', '┛', '━', '┻', '┓', '┫', '┳', '╋',
     ],
     widen_char: '━',
 };
 
-pub const THEME_ROUND: PathTheme = PathTheme {
+pub const THEME_ROUND: Theme = Theme {
     chars: [
         ' ', '╵', '╶', '╰', '╷', '│', '╭', '├', '╴', '╯', '─', '┴', '╮', '┤', '┬', '┼',
     ],
@@ -51,27 +67,34 @@ pub const THEME_ROUND: PathTheme = PathTheme {
 };
 
 impl Maze {
-    pub fn unicode_path(&self, theme: PathTheme, wide: bool) -> String {
-        let mut result = String::with_capacity(self.height * self.width * (wide as usize + 1));
+    pub fn unicode_path(&self, theme: &Theme, wide: bool) -> String {
+        let mut result =
+            String::with_capacity(self.height * (self.width + 1) * (wide as usize + 1));
         for y in 0..self.height {
             for x in 0..self.width {
-                let passages = self.path[y][x];
-                result.push(theme.chars[passages as usize]);
-                if wide && x != self.width - 1 {
-                    if passages & RIGHT != 0 {
-                        result.push(theme.widen_char);
-                    } else {
-                        result.push(' ');
-                    }
-                }
+                let dirs = self.path[y][x];
+                result.push_str(&theme.for_directions(dirs, wide));
             }
             result.push('\n');
         }
         result
     }
 
-    pub fn unicode_walls(&self, theme: PathTheme, wide: bool) -> String {
-        "unicode walls".to_string()
+    pub fn unicode_walls(&self, theme: &Theme, wide: bool) -> String {
+        let mut result = String::new();
+        for y in 0..self.height {
+            let mut line1 = String::new();
+            let mut line2 = String::new();
+
+            for x in 0..self.width {
+                let dirs = self.path[y][x];
+                line1.push_str(&theme.for_directions(dirs ^ 0b1111, wide));
+                line2.push_str(&theme.for_directions(dirs ^ 0b1111, wide));
+            }
+            // result.push_str(&format!("{}\n{}\n", line1, line2));
+            result.push_str(&format!("{}\n", line1));
+        }
+        result
     }
 }
 
