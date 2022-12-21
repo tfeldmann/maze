@@ -1,0 +1,81 @@
+<p><label for="slider_width" id="label_width"></label></p>
+<input
+  id="slider_width"
+  type="range"
+  min="1"
+  max="300"
+  value="70"
+  oninput="javascript:show_maze()"
+/>
+<p><label for="slider_height" id="label_height"></label></p>
+<input
+  id="slider_height"
+  type="range"
+  min="1"
+  max="300"
+  value="50"
+  oninput="javascript:show_maze()"
+/>
+<p><label for="select_theme" id="label_theme"></label></p>
+<select id="select_theme" oninput="javascript:show_maze()">
+  <option value="1">Thin</option>
+  <option value="2">Round</option>
+  <option value="3">Thick</option>
+</select>
+
+<pre id="out"></pre>
+
+<style>
+  input[type="range"] {
+    width: 400px;
+    height: 2px;
+    background: black;
+    border: none;
+    outline: none;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    width: 10px;
+    height: 10px;
+    background: black;
+    border: 2px solid black;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover {
+    background: black;
+  }
+  #out {
+    font-size: 15px;
+    line-height: 1;
+    font-family: monospace;
+  }
+</style>
+
+<script type="module">
+  import init, { maze } from "./pkg/maze_wasm.js";
+  init().then(() => {
+    window.maze = maze;
+    show_maze();
+  });
+</script>
+
+<script>
+  const slider_width = document.getElementById("slider_width");
+  const slider_height = document.getElementById("slider_height");
+  const select_theme = document.getElementById("select_theme");
+  const label_width = document.getElementById("label_width");
+  const label_height = document.getElementById("label_height");
+  const label_theme = document.getElementById("label_theme");
+
+  const out = document.getElementById("out");
+
+  function show_maze() {
+    let width = slider_width.value;
+    let height = slider_height.value;
+    let theme = parseInt(select_theme.value, 10);
+    label_width.innerText = "Width: " + width;
+    label_height.innerText = "Height: " + height;
+    let result = maze(width, height, theme);
+    out.innerText = result;
+  }
+</script>

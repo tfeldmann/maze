@@ -1,9 +1,10 @@
 /*
 UTF-8 table:
 
+    https://www.vidarholen.net/cgi-bin/labyrinth?w=39&h=24
     https://www.utf8-chartable.de/unicode-utf8-table.pl?start=9472&number=512
 
-Passages for grid values:
+Theme definition:
 
      0:
      1: U
@@ -73,91 +74,42 @@ impl Maze {
         for y in 0..self.height {
             for x in 0..self.width {
                 let dirs = self.path[y][x];
-                result.push_str(&theme.for_directions(dirs, wide));
+                let is_wide = wide && x < self.width - 1;
+                result.push_str(&theme.for_directions(dirs, is_wide));
             }
             result.push('\n');
         }
         result
     }
 
+    fn dirs(&self, x: i32, y: i32) -> u8 {
+        let (x_max, y_max) = (self.width as i32, self.height as i32);
+        if x >= 0 && x < x_max && y >= 0 && y < y_max {
+            self.path[y as usize][x as usize]
+        } else {
+            let up = x == -1 || x == x_max;
+            let left = y == -1 || y == y_max;
+            up as u8 * UP + left as u8 * LEFT
+        }
+    }
+
+    fn wall_dirs(&self, x: i32, y: i32) -> u8 {
+        let u = self.dirs(x, y - 1) & LEFT == 0;
+        let r = self.dirs(x, y) & UP == 0;
+        let d = self.dirs(x, y) & LEFT == 0;
+        let l = self.dirs(x - 1, y) & UP == 0;
+        u as u8 * UP + r as u8 * RIGHT + d as u8 * DOWN + l as u8 * LEFT
+    }
+
     pub fn unicode_walls(&self, theme: &Theme, wide: bool) -> String {
         let mut result = String::new();
-        for y in 0..self.height {
-            let mut line1 = String::new();
-            let mut line2 = String::new();
-
-            for x in 0..self.width {
-                let dirs = self.path[y][x];
-                line1.push_str(&theme.for_directions(dirs ^ 0b1111, wide));
-                line2.push_str(&theme.for_directions(dirs ^ 0b1111, wide));
+        for y in 0..=self.height {
+            for x in 0..=self.width {
+                let is_wide = wide && x < self.width;
+                result.push_str(&theme.for_directions(self.wall_dirs(x as i32, y as i32), is_wide));
             }
-            // result.push_str(&format!("{}\n{}\n", line1, line2));
-            result.push_str(&format!("{}\n", line1));
+            result.push('\n');
         }
         result
     }
-}
-
-pub fn walls(path: &Vec<Vec<u8>>) -> String {
-    // let mut path: Vec<Vec<u8>> = vec![vec![0; 3]; 3];
-    // path[0][0] = UP | DOWN;
-    // path[0][1] = DOWN | RIGHT;
-    // path[0][2] = LEFT | DOWN;
-    // path[1][0] = UP | RIGHT;
-    // path[1][1] = LEFT | UP | DOWN;
-    // path[1][2] = UP;
-    // path[2][0] = RIGHT;
-    // path[2][1] = LEFT | RIGHT | UP;
-    // path[2][2] = LEFT | DOWN;
-
-    // we create walls, which are a path *around* the given path
-    let height = path.len();
-    let width = path[0].len();
-
-    let mut edges: Vec<Vec<u8>> = vec![vec![0; width as usize + 1]; height as usize + 1];
-    // each cell in walls indicates, which neighbor cells dont have passages in the
-    // given direction.
-
-    for y in 0..height {
-        for x in 0..width + 1 {
-            let up = if y > 0 && x < width {
-                path[y - 1][x] & LEFT == 0
-            } else {
-                x == width
-            };
-            let right = if x < width {
-                path[y][x] & UP == 0
-            } else {
-                false
-            };
-            let down = if x < width {
-                path[y][x] & LEFT == 0
-            } else {
-                true
-            };
-            let left = if x > 0 {
-                path[y][x - 1] & UP == 0
-            } else {
-                false
-            };
-
-            let mut cell = 0;
-            if up {
-                cell |= UP;
-            }
-            if down {
-                cell |= DOWN;
-            }
-            if right {
-                cell |= RIGHT;
-            }
-            if left {
-                cell |= LEFT;
-            }
-
-            edges[y][x] = cell;
-        }
-        println!();
-    }
-    todo!()
 }
