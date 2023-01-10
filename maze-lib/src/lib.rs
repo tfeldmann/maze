@@ -145,12 +145,12 @@ impl Maze {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use unicode::THEME_ROUND;
 
     #[test]
     fn it_works() {
-        let maze = Maze::growing_tree(10, 10);
-        maze.render_ascii();
-        println!("{:?}", maze);
-        assert!(false);
+        let maze = Maze::growing_tree(20, 20);
+        let output = maze.unicode_walls(&THEME_ROUND, true);
+        println!("{}", output);
     }
 }
