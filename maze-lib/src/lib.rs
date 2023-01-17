@@ -23,35 +23,34 @@ pub const RIGHT: Dir = 0b0010;
 pub const DOWN: Dir = 0b0100;
 pub const LEFT: Dir = 0b1000;
 
-/*
-All direction permutations for BFS
-[
-    (0, 1, 2, 3),
-    (0, 1, 3, 2),
-    (0, 2, 1, 3),
-    (0, 2, 3, 1),
-    (0, 3, 1, 2),
-    (0, 3, 2, 1),
-    (1, 0, 2, 3),
-    (1, 0, 3, 2),
-    (1, 2, 0, 3),
-    (1, 2, 3, 0),
-    (1, 3, 0, 2),
-    (1, 3, 2, 0),
-    (2, 0, 1, 3),
-    (2, 0, 3, 1),
-    (2, 1, 0, 3),
-    (2, 1, 3, 0),
-    (2, 3, 0, 1),
-    (2, 3, 1, 0),
-    (3, 0, 1, 2),
-    (3, 0, 2, 1),
-    (3, 1, 0, 2),
-    (3, 1, 2, 0),
-    (3, 2, 0, 1),
-    (3, 2, 1, 0)
-]
-*/
+// All direction permutations for BFS. Picking a random one from this list should be
+// faster than shuffling a vec of directions.
+const PERMUTATIONS: [[usize; 4]; 24] = [
+    [0, 1, 2, 3],
+    [0, 1, 3, 2],
+    [0, 2, 1, 3],
+    [0, 2, 3, 1],
+    [0, 3, 1, 2],
+    [0, 3, 2, 1],
+    [1, 0, 2, 3],
+    [1, 0, 3, 2],
+    [1, 2, 0, 3],
+    [1, 2, 3, 0],
+    [1, 3, 0, 2],
+    [1, 3, 2, 0],
+    [2, 0, 1, 3],
+    [2, 0, 3, 1],
+    [2, 1, 0, 3],
+    [2, 1, 3, 0],
+    [2, 3, 0, 1],
+    [2, 3, 1, 0],
+    [3, 0, 1, 2],
+    [3, 0, 2, 1],
+    [3, 1, 0, 2],
+    [3, 1, 2, 0],
+    [3, 2, 0, 1],
+    [3, 2, 1, 0],
+];
 
 const DIRECTIONS: [Direction; 4] = [
     Direction {
@@ -87,9 +86,9 @@ impl Maze {
     // Algorithm based on:
     // https://weblog.jamisbuck.org/2011/1/27/maze-generation-growing-tree-algorithm
     pub fn growing_tree(width: usize, height: usize) -> Self {
+        let mut rng = thread_rng();
         let mut path: Vec<Vec<Dir>> = vec![vec![0; width]; height];
         let mut visited: Vec<Point> = Vec::with_capacity(height * width);
-        let mut dir_indices: Vec<u8> = (0..4).collect();
 
         // entry on top left
         path[0][0] |= UP;
@@ -99,12 +98,12 @@ impl Maze {
             // we always start from the last cell
             let cell = &visited[visited.len() - 1];
 
-            // shuffle directions
-            dir_indices.shuffle(&mut thread_rng());
+            // select a random direction order permutation
+            let dir_indices = PERMUTATIONS.choose(&mut rng).unwrap();
 
             let mut found = false;
-            for &dir_index in dir_indices.iter() {
-                let dir = &DIRECTIONS[dir_index as usize];
+            for dir_index in *dir_indices {
+                let dir = &DIRECTIONS[dir_index];
 
                 let nx = cell.x + dir.delta.x;
                 let ny = cell.y + dir.delta.y;
@@ -151,6 +150,6 @@ mod tests {
     fn it_works() {
         let maze = Maze::growing_tree(20, 20);
         let output = maze.unicode_walls(&THEME_ROUND, true);
-        println!("{}", output);
+        println!("{output}");
     }
 }
